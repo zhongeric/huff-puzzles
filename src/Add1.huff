@@ -13,5 +13,25 @@
 
 
 #define macro MAIN() = takes(0) returns(0) {
+    // Identify which function is being called.
+    0x00 calldataload 0xE0 shr          // [func_sig]
 
+    dup1 __FUNC_SIG(add1) eq add1_jump jumpi
+
+    // Revert if no function selectors match
+    reverts:
+        0x00 dup1 revert
+    
+    add1_jump:
+        // load calldata
+        0x04 calldataload   // [arg1]
+        // add 1 to arg1
+        0x01 add            // [arg1 + 1]
+
+        0x00                // [arg1 + 1, 0x00]
+        mstore              // []
+        // return the new value
+        0x20                // [0x20]
+        0x00                // [0x20, 0x00]
+        return              // []
 }
